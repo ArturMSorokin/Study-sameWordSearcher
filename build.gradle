@@ -1,0 +1,39 @@
+group 'ru.innopolis.uni.course2'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.5
+
+repositories {
+    mavenCentral()
+}
+//task hello {
+//    doLast {
+//        println 'Hello world!'
+//    }
+//}
+
+
+jar.doFirst(){
+    version = version + "." + new File("build.number").text;
+}
+
+
+jar.doLast() {
+    File file = new File("build.number");
+    file.write String.valueOf(Integer.parseInt(file.text) + 1);
+}
+defaultTasks 'clean', 'run'
+
+task clean << {
+    println 'Default Cleaning!'
+}
+
+task run << {
+    println 'Default Running!'
+}
+
+task other << {
+    println "I'm not a default task!"
+}
