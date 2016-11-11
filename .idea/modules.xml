@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sameWordSearcher.iml" filepath="$PROJECT_DIR$/.idea/modules/sameWordSearcher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sameWordSearcher_main.iml" filepath="$PROJECT_DIR$/.idea/modules/sameWordSearcher_main.iml" group="sameWordSearcher" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sameWordSearcher_test.iml" filepath="$PROJECT_DIR$/.idea/modules/sameWordSearcher_test.iml" group="sameWordSearcher" />
+    </modules>
+  </component>
+</project>
