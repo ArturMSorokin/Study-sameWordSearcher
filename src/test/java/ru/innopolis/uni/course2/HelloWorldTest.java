@@ -14,7 +14,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 /**
@@ -62,6 +63,10 @@ public class HelloWorldTest {
 
         helloWorld.setStreamWriter(streamWriter);
         assertEquals(new Long(16), helloWorld.handle("Tatarstan"));*/
+
+        StreamReader streamReader = mock(StreamReader.class);
+        when(streamReader.read(5)).thenReturn("Object");
+        this.mock.setStreamReader(streamReader);
 
     }
 
