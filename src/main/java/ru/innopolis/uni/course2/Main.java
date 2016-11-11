@@ -9,6 +9,7 @@ public class Main {
     private static Logger logger = LoggerFactory.getLogger(Main.class);
     static public void main(String[] ar) {
 
+
         System.out.println("Hello world");
         logger.error("someError");
     }
