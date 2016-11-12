@@ -11,10 +11,10 @@ import java.io.*;
 public class FileReadThread extends Thread {
 
     private static Logger logger = LoggerFactory.getLogger(FileReadThread.class);
-    StringBuilder buffer;
-    int lineNumber=10;
-    LineNumberReader reader;
-    String fileName;
+    private StringBuilder buffer;
+    private int lineNumber=10;
+    private LineNumberReader reader;
+    private String fileName;
 
     /**
      * Creates text file reader, running in it's own thread, and syncronously sending results to buffer.

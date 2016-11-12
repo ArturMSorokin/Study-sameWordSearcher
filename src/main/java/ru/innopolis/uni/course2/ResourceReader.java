@@ -9,7 +9,11 @@ public class ResourceReader {
     private FileReadThread fileReadThread;
     private TextParseThread textParseThread;
     private boolean complete = false;
-    public ResourceReader(String resource, Map<String,Integer>) {
+    public ResourceReader(String resource, Map<String,Integer> report) {
 
+    }
+
+    public boolean isComplete() {
+        return !(fileReadThread.isAlive() && textParseThread.isAlive());
     }
 }
