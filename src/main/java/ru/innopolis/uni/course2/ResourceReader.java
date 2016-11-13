@@ -24,6 +24,6 @@ public class ResourceReader {
     }
 
     public boolean isComplete() {
-        return !(fileReadThread.isAlive() && textParseThread.isAlive());
+        return !(fileReadThread.isAlive() || textParseThread.isAlive());
     }
 }
