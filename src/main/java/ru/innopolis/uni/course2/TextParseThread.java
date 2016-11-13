@@ -68,7 +68,7 @@ public class TextParseThread extends  Thread {
             else
                 report.put(s,1);
         }
-        logger.info(report.hashCode()+report.toString());
+//        logger.info(report.hashCode()+report.toString());
     }
 
     /**

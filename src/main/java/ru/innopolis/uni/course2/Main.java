@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
@@ -38,5 +39,12 @@ public class Main {
             }
         }
         logger.info(report.hashCode()+report.toString());
+        printReport(report);
+    }
+    private static void printReport(Map<String, Integer> report) {
+        for (Map.Entry<String, Integer> entry : report.entrySet())
+        {
+            System.out.println(entry.getKey() + "    " + entry.getValue());
+        }
     }
 }
