@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import static org.junit.Assert.*;
 /**
  * Created by olymp on 13.11.2016.
@@ -37,15 +40,30 @@ public class FileReadThreadTest {
             log.error(fileName+"  IOException");
         }
     }
+    class Dummy implements TextParseInterface {
+        public void parseBuffer(DataContainer buffer) {
+            this.buffer.add(buffer);
+        }
+        private Queue<DataContainer> buffer=new ConcurrentLinkedQueue<>();
+        public  void start(){}
+        public boolean isAlive() {return false;}
+        public String getResult() {
+            StringBuilder result = new StringBuilder();
+            while (!buffer.isEmpty()) {
+                DataContainer dataContainer = buffer.poll();
+                result.append(dataContainer.getStringBuilder().toString());
+            }
+            return result.toString();
+        }
+    }
     @Test
     public void Test() {
-        StringBuilder buffer = new StringBuilder();
-        Semaphore semaphore = new Semaphore();
-        FileReadThread fileReadThread = new FileReadThread(buffer, fileName,semaphore);
+        Dummy dummy = new Dummy();
+        FileReadThread fileReadThread = new FileReadThread( fileName,dummy);
         fileReadThread.start();
         try {
             fileReadThread.join();
-            assertTrue("result is incorrect", buffer.toString().equals(target));
+            assertTrue("result is incorrect", dummy.getResult().equals(target));
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }

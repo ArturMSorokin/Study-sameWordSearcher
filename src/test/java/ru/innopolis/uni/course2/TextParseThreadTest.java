@@ -35,7 +35,6 @@ public class TextParseThreadTest {
         report = new ConcurrentHashMap<>();
         reportEtalon = new ConcurrentHashMap<>();
         buffer.append(testString);
-        Semaphore semaphore = new Semaphore();
         textParseThread = new TextParseThread(buffer,report,semaphore);
         semaphore.setResourceReady(true);
         reportEtalon.put("один",1)  ;
