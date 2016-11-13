@@ -10,14 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ResourceReader {
     private static Logger logger = LoggerFactory.getLogger(ResourceReader.class);
     private FileReadThread fileReadThread;
-    private TextParseThread textParseThread;
+    private TextParseInterface textParseThread;
     public ResourceReader(String resource, ConcurrentHashMap<String, Integer> report) {
-        StringBuilder buffer = new StringBuilder();
-        Semaphore semaphore = new Semaphore();
-        fileReadThread = new FileReadThread(buffer,resource,semaphore);
-        textParseThread = new TextParseThread(buffer,report,semaphore);
+        textParseThread = new TextParseThread(report);
+        fileReadThread = new FileReadThread(resource,textParseThread);
         logger.info(report.hashCode()+report.toString());
-
     }
 
     public void start() {

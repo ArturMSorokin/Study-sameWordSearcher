@@ -5,52 +5,63 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.*;
 
 /**
  * Created by olymp on 10.11.2016.
+ *
  */
-public class TextParseThread extends  Thread {
+
+/**
+ * Class waits buffer setting by method parseBuffer, then it parses it and saves results to report,
+ * or setting complete flag,  in this case it finises.
+ */
+public class TextParseThread extends  Thread implements TextParseInterface {
     private static Logger logger = LoggerFactory.getLogger(TextParseThread.class);
-    private StringBuilder buffer;
+    private Queue<DataContainer> buffer=new ConcurrentLinkedQueue<>();
     private Map<String, Integer> report;
-    Semaphore semaphore;
 
     /**
      * Creates TextParseThread
-     * @param buffer
      * @param report
-     * @param semaphore - before parse semaphore should be set to 'true'.
      */
-    public TextParseThread(StringBuilder buffer, Map<String, Integer> report, Semaphore semaphore) {
-        this.buffer = buffer;
+    public TextParseThread( Map<String, Integer> report) {
         this.report = report;
-        this.semaphore = semaphore;
         logger.info(report.hashCode()+report.toString());
-
     }
     /**
      * Makes work, shouldn't be executed straight, instread should be invoked start() method.
      */
     public void run() {
-        try {
-            while (!semaphore.isResourceReady())
-                Thread.sleep(5);
-            String availableString = getAvailableString();
-            updateReport(availableString);
-        } catch (InterruptedException e) {
-            logger.warn("buffer.wait() interrupted");
+        while (!interrupted()) {
+                if (buffer.isEmpty()) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        logger.warn("buffer.wait() interrupted");
+                    }
+                } else {
+                    DataContainer dataContainer = buffer.poll();
+                    updateReport(getAvailableString(dataContainer));
+                    if (dataContainer.isComplete())
+                        return;
+                }
         }
+    }
+
+
+    public void parseBuffer(DataContainer buffer) {
+        this.buffer.add(buffer);
     }
 
     /**
      * Takes string from buffer, which should be filled by FileReadThread.
      * @return
      */
-    private String getAvailableString() {
-        synchronized (buffer) {
-            return buffer.toString();
-        }
+    private String getAvailableString(DataContainer dataContainer) {
+            return dataContainer.getStringBuilder().toString();
     }
 
     /**
@@ -59,7 +70,6 @@ public class TextParseThread extends  Thread {
      */
     private void updateReport(String string) {
         String[] words = string.split("[^\\p{IsCyrillic}]");
-
         ArrayList<String> cyrillicWords = null;
         cyrillicWords = getCyrillicWords(words);
         for (String s : cyrillicWords) {
@@ -68,7 +78,7 @@ public class TextParseThread extends  Thread {
             else
                 report.put(s,1);
         }
-//        logger.info(report.hashCode()+report.toString());
+        logger.info(report.hashCode()+report.toString());
     }
 
     /**

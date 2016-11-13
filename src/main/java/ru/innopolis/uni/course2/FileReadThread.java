@@ -3,6 +3,7 @@ package ru.innopolis.uni.course2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.*;
 
 /**
@@ -11,23 +12,22 @@ import java.io.*;
 public class FileReadThread extends Thread {
 
     private static Logger logger = LoggerFactory.getLogger(FileReadThread.class);
-    private StringBuilder buffer;
     private String fileName;
-    private Semaphore semaphore;
-    /**
-     * Creates text file reader, running in it's own thread, and syncronously sending results to buffer.
-     * @param buffer buffer.
-     * @param fileName name of file.
-     * @param semaphore
-     */
-    public FileReadThread(StringBuilder buffer, String fileName, Semaphore semaphore) {
-        this.buffer = buffer;
-        this.fileName = fileName;
-        this.semaphore = semaphore;
+    private TextParseInterface parser;
+    private  static int lineNumberRead=50;
+
+    private static int getLineNumberRead() {
+        return lineNumberRead;
     }
 
-
-
+    /**
+     * Creates text file reader, running in it's own thread, and syncronously sending results to buffer.
+     * @param fileName name of file.
+     */
+    public FileReadThread(String fileName, TextParseInterface parser) {
+        this.fileName = fileName;
+        this.parser = parser;
+    }
 
     private String getFileName() {
         return fileName;
@@ -38,20 +38,6 @@ public class FileReadThread extends Thread {
      */
     public void run() {
         read(getFileName());
-        synchronized (buffer) {
-            buffer.notify();
-        }
-        semaphore.setResourceReady(true);
-    }
-
-    /**
-     * Adds syncronously readed strings to buffer.
-     * @param string string ot add.
-     */
-    private void addStrings(String string) {
-        synchronized (buffer) {
-            buffer.append (string);
-        }
     }
 
     /**
@@ -71,9 +57,15 @@ public class FileReadThread extends Thread {
     private void readLines(BufferedReader reader) {
         String tmp;
         do {
-            tmp = readLine(reader);
-            addStrings(tmp+' ');
-        } while (tmp!=null);
+            DataContainer dataContainer = new DataContainer();
+            int linesReaded = getLineNumberRead();
+            do {
+                tmp = readLine(reader);
+                dataContainer.getStringBuilder().append(tmp + ' ');
+            } while (tmp != null && linesReaded-- > 0);
+            dataContainer.setComplete(tmp == null);
+            parser.parseBuffer(dataContainer);
+        }while (tmp!=null);
     }
 
     /**
