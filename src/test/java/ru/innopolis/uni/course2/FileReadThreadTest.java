@@ -40,7 +40,8 @@ public class FileReadThreadTest {
     @Test
     public void Test() {
         StringBuilder buffer = new StringBuilder();
-        FileReadThread fileReadThread = new FileReadThread(buffer, fileName);
+        Semaphore semaphore = new Semaphore();
+        FileReadThread fileReadThread = new FileReadThread(buffer, fileName,semaphore);
         fileReadThread.start();
         try {
             fileReadThread.join();

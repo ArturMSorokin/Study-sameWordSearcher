@@ -1,11 +1,9 @@
 package ru.innopolis.uni.course2;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.regex.*;
 
@@ -16,17 +14,28 @@ public class TextParseThread extends  Thread {
     private static Logger logger = LoggerFactory.getLogger(TextParseThread.class);
     private StringBuilder buffer;
     private Map<String, Integer> report;
+    Semaphore semaphore;
 
-    public TextParseThread(StringBuilder buffer, ConcurrentHashMap<String, Integer> report) {
+    /**
+     * Creates TextParseThread
+     * @param buffer
+     * @param report
+     * @param semaphore - before parse semaphore should be set to 'true'.
+     */
+    public TextParseThread(StringBuilder buffer, Map<String, Integer> report, Semaphore semaphore) {
         this.buffer = buffer;
         this.report = report;
-    }
+        this.semaphore = semaphore;
+        logger.info(report.hashCode()+report.toString());
 
+    }
+    /**
+     * Makes work, shouldn't be executed straight, instread should be invoked start() method.
+     */
     public void run() {
         try {
-            synchronized (buffer) {
-                buffer.wait();
-            }
+            while (!semaphore.isResourceReady())
+                Thread.sleep(5);
             String availableString = getAvailableString();
             updateReport(availableString);
         } catch (InterruptedException e) {
@@ -34,14 +43,21 @@ public class TextParseThread extends  Thread {
         }
     }
 
+    /**
+     * Takes string from buffer, which should be filled by FileReadThread.
+     * @return
+     */
     private String getAvailableString() {
         synchronized (buffer) {
             return buffer.toString();
         }
     }
 
+    /**
+     * Counts same word's occurance, saves result to map.
+     * @param string with words, that should be counted.
+     */
     private void updateReport(String string) {
-//        String[] words = string.split("[\\s,.:%$#!?]");
         String[] words = string.split("[^\\p{IsCyrillic}]");
 
         ArrayList<String> cyrillicWords = null;
@@ -52,17 +68,16 @@ public class TextParseThread extends  Thread {
             else
                 report.put(s,1);
         }
-        report.size();
+        logger.info(report.hashCode()+report.toString());
     }
 
+    /**
+     * Takes cyrillic words from 'words' and stores trem to List, and returns it.
+     * @param words
+     * @return
+     */
     private ArrayList<String> getCyrillicWords(String[] words) {
         Pattern pattern = Pattern.compile("[\\p{IsCyrillic}]+");
-        String str="ыва";
-        String str2="sdf";
-        if (pattern.matcher(str).matches()) {
-            int k = 0;
-        }
-
         ArrayList<String> cyrillicWords = new ArrayList<String>();
         for (String s : words) {
             Matcher matcher = pattern.matcher(s);

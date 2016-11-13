@@ -6,7 +6,6 @@ package ru.innopolis.uni.course2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +15,8 @@ public class Main {
     private static Logger logger = LoggerFactory.getLogger(Main.class);
     static public void main(String[] ar) {
         ConcurrentHashMap<String,Integer> report = new ConcurrentHashMap<>();
+        report.put("test",1);
+        logger.info(report.hashCode()+report.toString());
         List<ResourceReader> resourceReaders = new LinkedList<>();
         for (String s : ar) {
             logger.info(s);
@@ -24,12 +25,18 @@ public class Main {
             resourceReaders.add(resourceReader);
         }
         while (!resourceReaders.isEmpty()) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             Iterator<ResourceReader> iter = resourceReaders.iterator();
-            while(iter.hasNext())
-                if (iter.next().isComplete())
+            while(iter.hasNext()) {
+                if (iter.next().isComplete()) {
                     iter.remove();
+                }
+            }
         }
-
-        logger.info(report.toString());
+        logger.info(report.hashCode()+report.toString());
     }
 }

@@ -35,7 +35,9 @@ public class TextParseThreadTest {
         report = new ConcurrentHashMap<>();
         reportEtalon = new ConcurrentHashMap<>();
         buffer.append(testString);
-        textParseThread = new TextParseThread(buffer,report);
+        Semaphore semaphore = new Semaphore();
+        textParseThread = new TextParseThread(buffer,report,semaphore);
+        semaphore.setResourceReady(true);
         reportEtalon.put("один",1)  ;
         reportEtalon.put("два",2)  ;
         reportEtalon.put("три",1)  ;
@@ -53,10 +55,8 @@ public class TextParseThreadTest {
             buffer.notify();
         }
         try {
-            log.info("here1");
             if (textParseThread.isAlive())
                 textParseThread.join();
-            log.info("here2");
             log.info("report:"+report.toString());
             log.info("etalon:"+reportEtalon.toString());
             assertTrue("result is incorrect", report.equals(reportEtalon));

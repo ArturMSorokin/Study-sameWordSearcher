@@ -13,16 +13,21 @@ public class FileReadThread extends Thread {
     private static Logger logger = LoggerFactory.getLogger(FileReadThread.class);
     private StringBuilder buffer;
     private String fileName;
-
+    private Semaphore semaphore;
     /**
      * Creates text file reader, running in it's own thread, and syncronously sending results to buffer.
      * @param buffer buffer.
      * @param fileName name of file.
+     * @param semaphore
      */
-    public FileReadThread(StringBuilder buffer, String fileName) {
+    public FileReadThread(StringBuilder buffer, String fileName, Semaphore semaphore) {
         this.buffer = buffer;
         this.fileName = fileName;
+        this.semaphore = semaphore;
     }
+
+
+
 
     private String getFileName() {
         return fileName;
@@ -36,6 +41,7 @@ public class FileReadThread extends Thread {
         synchronized (buffer) {
             buffer.notify();
         }
+        semaphore.setResourceReady(true);
     }
 
     /**

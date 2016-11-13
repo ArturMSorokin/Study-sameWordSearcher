@@ -13,15 +13,17 @@ public class ResourceReader {
     private TextParseThread textParseThread;
     public ResourceReader(String resource, ConcurrentHashMap<String, Integer> report) {
         StringBuilder buffer = new StringBuilder();
-        fileReadThread = new FileReadThread(buffer,resource);
-
-        textParseThread = new TextParseThread(buffer,report);
+        Semaphore semaphore = new Semaphore();
+        fileReadThread = new FileReadThread(buffer,resource,semaphore);
+        textParseThread = new TextParseThread(buffer,report,semaphore);
+        logger.info(report.hashCode()+report.toString());
 
     }
 
     public void start() {
         fileReadThread.start();
         textParseThread.start();
+
     }
 
     public boolean isComplete() {
