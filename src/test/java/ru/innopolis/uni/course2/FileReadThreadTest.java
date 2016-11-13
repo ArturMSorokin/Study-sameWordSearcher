@@ -44,7 +44,7 @@ public class FileReadThreadTest {
         fileReadThread.start();
         try {
             fileReadThread.join();
-            assertTrue("result is incorrect", buffer.toString()==(target));
+            assertTrue("result is incorrect", buffer.toString().equals(target));
         } catch (InterruptedException e) {
             log.error(e.getMessage());
         }
