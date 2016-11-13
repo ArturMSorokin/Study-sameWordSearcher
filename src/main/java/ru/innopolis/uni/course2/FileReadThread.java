@@ -12,8 +12,6 @@ public class FileReadThread extends Thread {
 
     private static Logger logger = LoggerFactory.getLogger(FileReadThread.class);
     private StringBuilder buffer;
-    private int lineNumber=10;
-    private LineNumberReader reader;
     private String fileName;
 
     /**
@@ -24,7 +22,6 @@ public class FileReadThread extends Thread {
     public FileReadThread(StringBuilder buffer, String fileName) {
         this.buffer = buffer;
         this.fileName = fileName;
-        buffer = new StringBuilder();
     }
 
     private String getFileName() {
@@ -35,27 +32,10 @@ public class FileReadThread extends Thread {
      * Makes work, shouldn't be executed straight, instread should be invoked start() method.
      */
     public void run() {
-        if (initReader(getFileName())) {
-            while (!interrupted() && readLines()) { }
+        read(getFileName());
+        synchronized (buffer) {
+            buffer.notify();
         }
-    }
-
-    private int getLineNumber() {
-        return lineNumber;
-    }
-
-    /**
-     * Reads set of lines and syncronously stores in buffer.
-     * @return true if file still has data, else otherwise.
-     */
-    boolean readLines() {
-        int i=lineNumber;
-        String tmp;
-        do {
-            tmp = readLine();
-            addStrings(tmp);
-        } while (i-->0 && tmp!=null);
-        return !(tmp==null);
     }
 
     /**
@@ -70,9 +50,8 @@ public class FileReadThread extends Thread {
 
     /**
      * Tries to read string from stream.
-     * @return readed string or null if stream is empty.
      */
-    private String readLine() {
+    private String readLine(BufferedReader reader) {
         try {
             return reader.readLine();
         } catch (IOException e) {
@@ -80,16 +59,29 @@ public class FileReadThread extends Thread {
         }
         return null;
     }
+    /**
+     * Reads set of lines and syncronously stores in buffer.
+     */
+    private void readLines(BufferedReader reader) {
+        String tmp;
+        do {
+            tmp = readLine(reader);
+            addStrings(tmp+' ');
+        } while (tmp!=null);
+    }
 
-    private boolean initReader(String file) {
-        Reader fileReader = null;
-        try {
-            fileReader = new FileReader(file);
-            reader = new LineNumberReader(fileReader);
-            return true;
+    /**
+     * Reads file.
+     * @param file
+     */
+    private void read(String file) {
+        try (Reader fileReader = new FileReader(file);
+                BufferedReader reader = new LineNumberReader(fileReader)) {
+            readLines(reader);
         } catch (FileNotFoundException e) {
             logger.error("File "+file+" not found");
+        } catch (IOException e) {
+            logger.error("File "+file+" IOException "+e.getMessage());
         }
-        return false;
     }
 }

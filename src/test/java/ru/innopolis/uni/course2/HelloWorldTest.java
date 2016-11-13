@@ -64,9 +64,9 @@ public class HelloWorldTest {
         helloWorld.setStreamWriter(streamWriter);
         assertEquals(new Long(16), helloWorld.handle("Tatarstan"));*/
 
-        StreamReader streamReader = mock(StreamReader.class);
-        when(streamReader.read(5)).thenReturn("Object");
-        this.mock.setStreamReader(streamReader);
+//        StreamReader streamReader = mock(StreamReader.class);
+//        when(streamReader.read(5)).thenReturn("Object");
+//        this.mock.setStreamReader(streamReader);
 
     }
 
